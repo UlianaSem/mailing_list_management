@@ -1,0 +1,38 @@
+{% extends 'mailing_list/base.html' %}
+
+
+{% block content %}
+    <a href="{% url 'mailing:create' %}" class="btn btn-primary mb-2">Создать рассылку</a>
+    <div class="row">
+        {% for object in object_list %}
+                <div class="col-md-4">
+                  <div class="card mb-4 box-shadow">
+                    <div class="card-header">
+                        <p class="card-text">Информация о рассылке<p>
+                        <a href="{% url 'mailing:view' object.pk %}" class="btn btn-sm btn-outline-secondary">Посмотреть</a>
+                    </div>
+                    <div class="card-body">
+                      <p class="card-text">
+                          {% if object.start_time %}
+                            Время рассылки: {{ object.start_time }}
+                          {% endif %}</p>
+                      <p class="card-text">
+                          {% if object.periodicity %}
+                            Периодичность рассылки: {{ object.periodicity }}
+                          {% endif %}</p>
+                      <p class="card-text">
+                          {% if object.status %}
+                            Статус рассылки: {{ object.status }}
+                          {% endif %}</p>
+                      <div class="d-flex justify-content-between align-items-center">
+                        <div class="btn-group">
+                          <a href="{% url 'mailing:edit' object.pk %}" class="btn btn-sm btn-outline-secondary">Изменить</a>
+                          <a href="{% url 'mailing:delete' object.pk %}" class="btn btn-sm btn-outline-secondary">Удалить</a>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+        {% endfor %}
+    </div>
+{% endblock %}

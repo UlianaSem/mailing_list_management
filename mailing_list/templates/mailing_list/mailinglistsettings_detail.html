@@ -1,0 +1,39 @@
+{% extends 'mailing_list/base.html' %}
+
+
+{% block content %}
+                <div class="col-md-9">
+                  <div class="card mb-4 box-shadow">
+                    <div class="card-header">
+                        <p class="card-text">Информация о рассылке<p>
+                        <a href="{% url 'mailing:list' %}" class="btn btn-sm btn-outline-secondary">К списку</a>
+                    </div>
+                    <div class="card-body">
+                      <p class="card-text">
+                          {% if object.start_time %}
+                            <h4>Время рассылки:</h4> {{ object.start_time }}
+                          {% endif %}</p>
+                      <p class="card-text">
+                          {% if object.periodicity %}
+                            <h4>Периодичность рассылки:</h4> {{ object.periodicity }}
+                          {% endif %}</p>
+                      <p class="card-text">
+                          {% if object.status %}
+                            <h4>Статус рассылки:</h4> {{ object.status }}
+                          {% endif %}</p>
+                      <ul class="list-group mb-2">
+                          {% if object.users %}
+                            <h4>Участники рассылки:</h4> {% for user_item in object.users.all %}
+                                <li class="list-group-item">{{ user_item.email }} </li>
+                            {% endfor %}
+                          {% endif %}</ul>
+                      <div class="d-flex justify-content-between align-items-center">
+                        <div class="btn-group">
+                          <a href="{% url 'mailing:edit' object.pk %}" class="btn btn-sm btn-outline-secondary">Изменить</a>
+                          <a href="{% url 'mailing:delete' object.pk %}" class="btn btn-sm btn-outline-secondary">Удалить</a>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+{% endblock %}
