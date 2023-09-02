@@ -2,48 +2,60 @@ from django.core.mail import send_mail
 from django.conf import settings
 import django.utils.timezone
 
-from user.models import User
 from mailing_list.models import Message, MailingListSettings, Log
 
 
-def _send_mail(users):
-    user_email = [User.objects.get(pk=int(pk)).email for pk in users]
-    message_subject = Message.objects.filter(status='К отправке')[0].subject
-    message_text = Message.objects.filter(status='К отправке')[0].text  # IndexError, error with choice message
+def _send_email(user, mailing):
+    try:
+        message = Message.objects.filter(status=Message.TO_BE_SENT)[0]
 
-    send_mail(
-            message_subject,
-            message_text,
-            settings.EMAIL_HOST_USER,
-            user_email,
-        )
+    except IndexError:
+        pass
 
-#     add adding Logs
+    result = send_mail(
+        subject=message.subject,
+        message=message.text,
+        from_email=settings.EMAIL_HOST_USER,
+        recipient_list=[user.email],
+        fail_silently=False
+    )
+
+    Log.objects.create(
+        mailing_list=mailing.id,
+        user=user.id,
+        status=result,
+        response=mailing,
+    )
 
 
-# Если создается рассылка со временем старта в будущем, то отправка должна стартовать автоматически по
-# наступлению этого времени без дополнительных действий со стороны пользователя системы.
 def send_mails():
     now = django.utils.timezone.datetime.now()
 
-    for mailing in MailingListSettings.objects.filter(status='Запущена'):
+    for mailing in MailingListSettings.objects.filter(status=MailingListSettings.STARTED):
 
         if mailing.start_time < now < mailing.end_time:
 
             for mailing_client in mailing.objects.users.all():
 
                 log = Log.objects.filter(
-                    client
-
+                    user=mailing_client,
+                    mailing_list=mailing
                 )
 
+                if log.exists():
+                    last_try_date = log.order_by('-time').first().time
 
+                    if mailing.periodicity == MailingListSettings.DAILY:
+                        if (now - last_try_date) >= MailingListSettings.DAILY:
+                            _send_email(mailing_client, mailing)
 
+                    elif mailing.periodicity == MailingListSettings.WEEKLY:
+                        if (now - last_try_date) >= MailingListSettings.WEEKLY:
+                            _send_email(mailing_client, mailing)
 
-# По ходу отправки сообщений должна собираться статистика(см.описание сущности «сообщение» и «логи» выше) по
-# каждому сообщению для последующего формирования отчетов.
+                    elif mailing.periodicity == MailingListSettings.MONTHLY:
+                        if (now - last_try_date) >= MailingListSettings.MONTHLY:
+                            _send_email(mailing_client, mailing)
 
-
-# Внешний сервис, который принимает отправляемые сообщения, может долго обрабатывать запрос, отвечать некорректными
-# данными, на какое - то время вообще не принимать запросы.Нужна корректная обработка подобных ошибок.Проблемы с
-# внешним сервисом не должны влиять на стабильность работ разрабатываемого сервиса рассылок.
+                else:
+                    _send_email(mailing_client, mailing)
