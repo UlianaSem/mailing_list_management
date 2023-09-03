@@ -18,6 +18,6 @@ class MessageAdmin(admin.ModelAdmin):
 
 @admin.register(Log)
 class LogAdmin(admin.ModelAdmin):
-    list_display = ['pk', 'mailing_list', 'time', 'status', 'response', ]
-    list_filter = ['mailing_list', 'status', 'response', ]
-    search_fields = ['mailing_list', 'time', 'status', 'response', ]
+    list_display = ['pk', 'mailing_list', 'time', 'status', ]
+    list_filter = ['mailing_list', 'status', ]
+    search_fields = ['mailing_list', 'time', 'status', ]

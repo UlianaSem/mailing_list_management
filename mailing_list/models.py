@@ -71,9 +71,8 @@ class Log(models.Model):
     mailing_list = models.ForeignKey(MailingListSettings, on_delete=models.DO_NOTHING, verbose_name='рассылка')
     user = models.ForeignKey(User, on_delete=models.DO_NOTHING, verbose_name='клиент рассылки', **NULLABLE)
 
-    time = models.DateTimeField(verbose_name='дата и время последней попытки', auto_created=True)
+    time = models.DateTimeField(verbose_name='дата и время последней попытки', auto_now_add=True)
     status = models.BooleanField(verbose_name='статус попытки')
-    response = models.CharField(max_length=200, verbose_name='ответ почтового сервера', **NULLABLE)
 
     def __str__(self):
         return f'{self.time} {self.status}'
