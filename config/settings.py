@@ -141,5 +141,5 @@ EMAIL_HOST_PASSWORD = os.getenv('YANDEX_PASSWORD')
 EMAIL_USE_SSL = True
 
 CRONJOBS = [
-    ('* * * * *', 'mailing_list.ser.commands.start_mailing_list')
+    ('*/1 * * * *', 'mailing_list.services.send_mails'),
 ]
