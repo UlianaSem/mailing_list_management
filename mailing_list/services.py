@@ -5,18 +5,18 @@ import django.utils.timezone
 from mailing_list.models import Message, MailingListSettings, Log
 
 
-def _send_email(user, mailing, message):
+def _send_email(client, mailing, message):
     result = send_mail(
         subject=message.subject,
         message=message.text,
         from_email=settings.EMAIL_HOST_USER,
-        recipient_list=[user.email],
+        recipient_list=[client.email],
         fail_silently=False,
     )
     print(result)
     Log.objects.create(
         mailing_list=mailing,
-        user=user,
+        client=client,
         status=result,
     )
 
@@ -30,7 +30,7 @@ def send_mails():
 
         if mailing.start_time < now_time < mailing.end_time:
 
-            for mailing_client in mailing.users.all():
+            for mailing_client in mailing.clients.all():
 
                 message = mailing.message_set.filter(status=Message.TO_BE_SENT).first()
                 print(message)
@@ -39,7 +39,7 @@ def send_mails():
                     return
 
                 log = Log.objects.filter(
-                    user=mailing_client,
+                    client=mailing_client,
                     mailing_list=mailing
                 )
 

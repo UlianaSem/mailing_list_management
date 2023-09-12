@@ -22,9 +22,9 @@
                             <h4>Статус рассылки:</h4> {{ object.status }}
                           {% endif %}</p>
                       <ul class="list-group mb-2">
-                          {% if object.users %}
-                            <h4>Участники рассылки:</h4> {% for user_item in object.users.all %}
-                                <li class="list-group-item">{{ user_item.email }} </li>
+                          {% if object.clients %}
+                            <h4>Участники рассылки:</h4> {% for client_item in object.clients.all %}
+                                <li class="list-group-item">{{ client_item.email }} </li>
                             {% endfor %}
                           {% endif %}</ul>
                       <div class="d-flex justify-content-between align-items-center">

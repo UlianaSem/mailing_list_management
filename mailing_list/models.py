@@ -1,7 +1,7 @@
 from datetime import timedelta, time
 
 from django.db import models
-from user.models import User
+from clients.models import Client
 
 
 NULLABLE = {'blank': True, 'null': True}
@@ -33,7 +33,7 @@ class MailingListSettings(models.Model):
     periodicity = models.DurationField(verbose_name='периодичность', default=MONTHLY, choices=PERIODICITY_CHOICES)
     status = models.CharField(max_length=50, choices=STATUS_CHOICES, default=CREATED, verbose_name='статус рассылки')
 
-    users = models.ManyToManyField(User, verbose_name='клиенты рассылки')
+    clients = models.ManyToManyField(Client, verbose_name='клиенты рассылки')
 
     def __str__(self):
         return f'time: {self.start_time} - {self.end_time}, periodicity: {self.periodicity}, status: {self.status}'
@@ -69,7 +69,7 @@ class Message(models.Model):
 
 class Log(models.Model):
     mailing_list = models.ForeignKey(MailingListSettings, on_delete=models.DO_NOTHING, verbose_name='рассылка')
-    user = models.ForeignKey(User, on_delete=models.DO_NOTHING, verbose_name='клиент рассылки', **NULLABLE)
+    client = models.ForeignKey(Client, on_delete=models.DO_NOTHING, verbose_name='клиент рассылки', **NULLABLE)
 
     time = models.DateTimeField(verbose_name='дата и время последней попытки', auto_now_add=True)
     status = models.BooleanField(verbose_name='статус попытки')

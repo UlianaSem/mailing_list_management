@@ -1,46 +1,46 @@
 from django.urls import reverse_lazy, reverse
 from django.views.generic import ListView, DetailView, DeleteView, UpdateView, CreateView
-from user.models import User
+from clients.models import Client
 
 
-class UserListView(ListView):
-    model = User
+class ClientListView(ListView):
+    model = Client
     extra_context = {
         'title': 'Список пользователей'
     }
 
 
-class UserCreateView(CreateView):
-    model = User
+class ClientCreateView(CreateView):
+    model = Client
     fields = ['email', 'name', 'comment', ]
-    success_url = reverse_lazy('user:list')
+    success_url = reverse_lazy('clients:list')
     extra_context = {
         'title': 'Создание пользователя'
     }
 
 
-class UserUpdateView(UpdateView):
-    model = User
+class ClientUpdateView(UpdateView):
+    model = Client
     fields = ['email', 'name', 'comment', ]
-    success_url = reverse_lazy('user:list')
+    success_url = reverse_lazy('clients:list')
     extra_context = {
         'title': 'Редактирование пользователя'
     }
 
     def get_success_url(self):
-        return reverse('user:view', args=[self.object.pk])
+        return reverse('clients:view', args=[self.object.pk])
 
 
-class UserDeleteView(DeleteView):
-    model = User
-    success_url = reverse_lazy('user:list')
+class ClientDeleteView(DeleteView):
+    model = Client
+    success_url = reverse_lazy('clients:list')
     extra_context = {
         'title': 'Удаление пользователя'
     }
 
 
-class UserDetailView(DetailView):
-    model = User
+class ClientDetailView(DetailView):
+    model = Client
     extra_context = {
         'title': 'Подробная информация о пользователе'
     }

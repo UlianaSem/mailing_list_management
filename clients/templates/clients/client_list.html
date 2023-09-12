@@ -2,32 +2,33 @@
 
 
 {% block content %}
-                <div class="col-md-9">
+    <a href="{% url 'clients:create' %}" class="btn btn-primary mb-2">Создать клиента</a>
+    <div class="row">
+        {% for object in object_list %}
+                <div class="col-md-4">
                   <div class="card mb-4 box-shadow">
                     <div class="card-header">
                         <p class="card-text">Информация о клиенте<p>
-                        <a href="{% url 'user:list' %}" class="btn btn-sm btn-outline-secondary">К списку</a>
+                        <a href="{% url 'clients:view' object.pk %}" class="btn btn-sm btn-outline-secondary">Посмотреть</a>
                     </div>
                     <div class="card-body">
                       <p class="card-text">
                           {% if object.name %}
-                            <h4>Имя:</h4>  {{ object.name }}
+                            Имя: {{ object.name }}
                           {% endif %}</p>
                       <p class="card-text">
                           {% if object.email %}
-                            <h4>Email:</h4> {{ object.email }}
-                          {% endif %}</p>
-                      <p class="card-text">
-                          {% if object.comment %}
-                            <h4>Комментарий:</h4> {{ object.comment }}
+                           Email: {{ object.email }}
                           {% endif %}</p>
                       <div class="d-flex justify-content-between align-items-center">
                         <div class="btn-group">
-                          <a href="{% url 'user:edit' object.pk %}" class="btn btn-sm btn-outline-secondary">Изменить</a>
-                          <a href="{% url 'user:delete' object.pk %}" class="btn btn-sm btn-outline-secondary">Удалить</a>
+                          <a href="{% url 'clients:edit' object.pk %}" class="btn btn-sm btn-outline-secondary">Изменить</a>
+                          <a href="{% url 'clients:delete' object.pk %}" class="btn btn-sm btn-outline-secondary">Удалить</a>
                         </div>
                       </div>
                     </div>
                   </div>
                 </div>
+        {% endfor %}
+    </div>
 {% endblock %}
