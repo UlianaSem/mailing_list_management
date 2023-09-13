@@ -12,7 +12,7 @@ class MailingListSettingsListView(ListView):
 
 class MailingListSettingsCreateView(CreateView):
     model = MailingListSettings
-    fields = ['start_time', 'end_time', 'periodicity', 'status', 'users', ]
+    fields = ['start_time', 'end_time', 'periodicity', 'status', 'clients', ]
     success_url = reverse_lazy('mailing:list')
     extra_context = {
         'title': 'Создание рассылки'
@@ -21,7 +21,7 @@ class MailingListSettingsCreateView(CreateView):
 
 class MailingListSettingsUpdateView(UpdateView):
     model = MailingListSettings
-    fields = ['start_time', 'end_time', 'periodicity', 'status', 'users', ]
+    fields = ['start_time', 'end_time', 'periodicity', 'status', 'clients', ]
     success_url = reverse_lazy('mailing:list')
     extra_context = {
         'title': 'Редактирование рассылки'
