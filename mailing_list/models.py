@@ -2,7 +2,7 @@ from datetime import timedelta, time
 
 from django.db import models
 from clients.models import Client
-
+from users.models import User
 
 NULLABLE = {'blank': True, 'null': True}
 
@@ -34,6 +34,7 @@ class MailingListSettings(models.Model):
     status = models.CharField(max_length=50, choices=STATUS_CHOICES, default=CREATED, verbose_name='статус рассылки')
 
     clients = models.ManyToManyField(Client, verbose_name='клиенты рассылки')
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='владелец', **NULLABLE)
 
     def __str__(self):
         return f'time: {self.start_time} - {self.end_time}, periodicity: {self.periodicity}, status: {self.status}'
