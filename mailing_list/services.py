@@ -13,7 +13,7 @@ def _send_email(client, mailing, message):
         recipient_list=[client.email],
         fail_silently=False,
     )
-    print(result)
+
     Log.objects.create(
         mailing_list=mailing,
         client=client,
@@ -26,14 +26,12 @@ def send_mails():
     now_time = now.time()
 
     for mailing in MailingListSettings.objects.filter(status=MailingListSettings.STARTED):
-        print(mailing)
 
         if mailing.start_time < now_time < mailing.end_time:
 
             for mailing_client in mailing.clients.all():
 
                 message = mailing.message_set.filter(status=Message.TO_BE_SENT).first()
-                print(message)
 
                 if message is None:
                     return
