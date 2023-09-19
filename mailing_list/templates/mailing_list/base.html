@@ -28,9 +28,16 @@
             </div>
             <div class="col-sm-4 offset-md-1 py-4">
               <ul class="list-unstyled">
-                <li><a href="{% url 'mailing:list' %}" class="text-white">Рассылки</a></li>
-                <li><a href="{% url 'clients:list' %}" class="text-white">Клиенты</a></li>
-                <li><a href="{% url 'mailing:logs' %}" class="text-white">Логи</a></li>
+                {% if user.is_authenticated %}
+                  <li><a href="{% url 'mailing:list' %}" class="text-white">Рассылки</a></li>
+                  <li><a href="{% url 'clients:list' %}" class="text-white">Клиенты</a></li>
+                  <li><a href="{% url 'mailing:logs' %}" class="text-white">Логи</a></li>
+                  <li><a href="{% url 'users:logout' %}" class="text-white">Выйти</a></li>
+                {% else %}
+                  <li><a href="{% url 'users:login' %}" class="text-white">Войти</a></li>
+                  <li><a href="{% url 'users:register' %}" class="text-white">Регистрация</a></li>
+                {% endif %}
+                 <li><a href="{% url 'blog:list' %}" class="text-white">Блог</a></li>
               </ul>
             </div>
           </div>
@@ -38,9 +45,6 @@
       </div>
       <div class="navbar navbar-dark bg-dark box-shadow">
         <div class="container d-flex justify-content-between">
-          <a href="#" class="navbar-brand d-flex align-items-center">
-            <strong>Меню</strong>
-          </a>
           <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarHeader" aria-controls="navbarHeader" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
           </button>

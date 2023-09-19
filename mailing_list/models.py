@@ -43,6 +43,10 @@ class MailingListSettings(models.Model):
         verbose_name = 'настройки рассылки'
         verbose_name_plural = 'настройки рассылки'
 
+        permissions = [
+            ('change_status', 'Can turn off mailing list')
+        ]
+
 
 class Message(models.Model):
     TO_BE_SENT = 'К отправке'
