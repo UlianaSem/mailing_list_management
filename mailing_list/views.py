@@ -7,9 +7,10 @@ from django.views.generic import ListView, DetailView, DeleteView, UpdateView, C
 from blog.models import Blog
 from mailing_list.forms import MailingListSettingsForm, MessageForm
 from mailing_list.models import MailingListSettings, Log, Message
+from mailing_list.services import MailingListCacheMixin
 
 
-class MailingListSettingsListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
+class MailingListSettingsListView(LoginRequiredMixin, PermissionRequiredMixin, MailingListCacheMixin, ListView):
     model = MailingListSettings
     permission_required = 'mailing_list.view_mailinglistsettings'
     extra_context = {
@@ -17,7 +18,7 @@ class MailingListSettingsListView(LoginRequiredMixin, PermissionRequiredMixin, L
     }
 
     def get_queryset(self):
-        queryset = super().get_queryset()
+        queryset = self.get_mailing_list_cache()
 
         if not self.request.user.is_staff:
             queryset = queryset.filter(owner=self.request.user)

@@ -1,13 +1,17 @@
 from django.views.generic import ListView, DetailView
 
 from blog.models import Blog
+from blog.services import BlogCacheMixin
 
 
-class BlogListView(ListView):
+class BlogListView(BlogCacheMixin, ListView):
     model = Blog
     extra_context = {
         'title': 'Наш блог'
     }
+
+    def get_queryset(self):
+        return self.get_blog_cache()
 
 
 class BlogDetailView(DetailView):

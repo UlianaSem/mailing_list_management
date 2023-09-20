@@ -1,8 +1,26 @@
+from django.core.cache import cache
 from django.core.mail import send_mail
 from django.conf import settings
 import django.utils.timezone
 
 from mailing_list.models import Message, MailingListSettings, Log
+
+
+class MailingListCacheMixin:
+
+    def get_mailing_list_cache(self):
+        if settings.CACHE_ENABLED:
+            key = 'mailing_list'
+            queryset = cache.get(key)
+
+            if queryset is None:
+                queryset = super().get_queryset()
+                cache.set(key, queryset)
+
+        else:
+            queryset = super().get_queryset()
+
+        return queryset
 
 
 def _send_email(client, mailing, message):
