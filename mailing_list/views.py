@@ -1,14 +1,17 @@
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.forms import inlineformset_factory
 from django.http import Http404
 from django.urls import reverse_lazy, reverse
 from django.views.generic import ListView, DetailView, DeleteView, UpdateView, CreateView
 
+from blog.models import Blog
 from mailing_list.forms import MailingListSettingsForm, MessageForm
 from mailing_list.models import MailingListSettings, Log, Message
 
 
-class MailingListSettingsListView(ListView):
+class MailingListSettingsListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
     model = MailingListSettings
+    permission_required = 'mailing_list.view_mailinglistsettings'
     extra_context = {
         'title': 'Список рассылок'
     }
@@ -21,9 +24,26 @@ class MailingListSettingsListView(ListView):
 
         return queryset
 
+    def get_context_data(self, *args, **kwargs):
+        context_data = super().get_context_data(*args, **kwargs)
 
-class MailingListSettingsCreateView(CreateView):
+        blog = Blog.objects.order_by("?")[:3]
+        context_data['blog'] = blog
+
+        context_data['all'] = context_data['object_list'].count()
+        context_data['active'] = context_data['object_list'].filter(status=MailingListSettings.STARTED).count()
+
+        mailing_list = context_data['object_list'].prefetch_related('clients')
+        clients = set()
+        [[clients.add(client.email) for client in mailing.clients.all()] for mailing in mailing_list]
+        context_data['clients_count'] = len(clients)
+
+        return context_data
+
+
+class MailingListSettingsCreateView(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
     model = MailingListSettings
+    permission_required = 'mailing_list.add_mailinglistsettings'
     form_class = MailingListSettingsForm
     success_url = reverse_lazy('mailing:list')
     extra_context = {
@@ -57,8 +77,9 @@ class MailingListSettingsCreateView(CreateView):
         return super().form_valid(form)
 
 
-class MailingListSettingsUpdateView(UpdateView):
+class MailingListSettingsUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     model = MailingListSettings
+    permission_required = ['mailing_list.change_mailinglistsettings', 'mailing_list.change_status']
     form_class = MailingListSettingsForm
     extra_context = {
         'title': 'Редактирование рассылки'
@@ -100,8 +121,9 @@ class MailingListSettingsUpdateView(UpdateView):
         return super().form_valid(form)
 
 
-class MailingListSettingsDeleteView(DeleteView):
+class MailingListSettingsDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
     model = MailingListSettings
+    permission_required = 'mailing_list.delete_mailinglistsettings'
     success_url = reverse_lazy('mailing:list')
     extra_context = {
         'title': 'Удаление рассылки'
@@ -116,8 +138,9 @@ class MailingListSettingsDeleteView(DeleteView):
         return self.object
 
 
-class MailingListSettingsDetailView(DetailView):
+class MailingListSettingsDetailView(LoginRequiredMixin, PermissionRequiredMixin, DetailView):
     model = MailingListSettings
+    permission_required = 'mailing_list.view_mailinglistsettings'
     extra_context = {
         'title': 'Подробная информация о рассылке'
     }
@@ -131,8 +154,9 @@ class MailingListSettingsDetailView(DetailView):
         return self.object
 
 
-class LogListView(ListView):
+class LogListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
     model = Log
+    permission_required = 'mailing_list.add_log'
     extra_context = {
         'title': 'Логи рассылок'
     }
