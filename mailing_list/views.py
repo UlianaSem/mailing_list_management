@@ -10,6 +10,33 @@ from mailing_list.models import MailingListSettings, Log, Message
 from mailing_list.services import MailingListCacheMixin
 
 
+class GetObjectMixin:
+
+    def get_object(self, queryset):
+        self.object = super().get_object(queryset)
+
+        if self.object.owner != self.request.user:
+            raise Http404
+
+        return self.object
+
+
+class GetContextDataMixin:
+
+    def get_context_data(self, **kwargs):
+        context_data = super().get_context_data(**kwargs)
+        MessageFormset = inlineformset_factory(MailingListSettings, Message, extra=1, form=MessageForm)
+
+        if self.request.method == 'POST':
+            formset = MessageFormset(self.request.POST, instance=self.object)
+        else:
+            formset = MessageFormset(instance=self.object)
+
+        context_data['formset'] = formset
+
+        return context_data
+
+
 class MailingListSettingsListView(LoginRequiredMixin, PermissionRequiredMixin, MailingListCacheMixin, ListView):
     model = MailingListSettings
     permission_required = 'mailing_list.view_mailinglistsettings'
@@ -42,7 +69,7 @@ class MailingListSettingsListView(LoginRequiredMixin, PermissionRequiredMixin, M
         return context_data
 
 
-class MailingListSettingsCreateView(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
+class MailingListSettingsCreateView(LoginRequiredMixin, GetContextDataMixin, CreateView):
     model = MailingListSettings
     permission_required = 'mailing_list.add_mailinglistsettings'
     form_class = MailingListSettingsForm
@@ -52,17 +79,7 @@ class MailingListSettingsCreateView(LoginRequiredMixin, PermissionRequiredMixin,
     }
 
     def get_context_data(self, **kwargs):
-        context_data = super().get_context_data(**kwargs)
-        MessageFormset = inlineformset_factory(MailingListSettings, Message, extra=1, form=MessageForm)
-
-        if self.request.method == 'POST':
-            formset = MessageFormset(self.request.POST, instance=self.object)
-        else:
-            formset = MessageFormset(instance=self.object)
-
-        context_data['formset'] = formset
-
-        return context_data
+        return super().get_context_data(**kwargs)
 
     def form_valid(self, form):
         context_data = self.get_context_data()
@@ -78,9 +95,9 @@ class MailingListSettingsCreateView(LoginRequiredMixin, PermissionRequiredMixin,
         return super().form_valid(form)
 
 
-class MailingListSettingsUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
+class MailingListSettingsUpdateView(LoginRequiredMixin, GetObjectMixin, GetContextDataMixin, UpdateView):
     model = MailingListSettings
-    permission_required = ['mailing_list.change_mailinglistsettings', 'mailing_list.change_status']
+    # permission_required = ['mailing_list.change_mailinglistsettings', 'mailing_list.change_status']
     form_class = MailingListSettingsForm
     extra_context = {
         'title': 'Редактирование рассылки'
@@ -90,25 +107,10 @@ class MailingListSettingsUpdateView(LoginRequiredMixin, PermissionRequiredMixin,
         return reverse('mailing:view', args=[self.object.pk])
 
     def get_object(self, queryset=None):
-        self.object = super().get_object(queryset)
-
-        if self.object.owner != self.request.user:
-            raise Http404
-
-        return self.object
+        return super().get_object(queryset)
 
     def get_context_data(self, **kwargs):
-        context_data = super().get_context_data(**kwargs)
-        MessageFormset = inlineformset_factory(MailingListSettings, Message, extra=1, form=MessageForm)
-
-        if self.request.method == 'POST':
-            formset = MessageFormset(self.request.POST, instance=self.object)
-        else:
-            formset = MessageFormset(instance=self.object)
-
-        context_data['formset'] = formset
-
-        return context_data
+        return super().get_context_data(**kwargs)
 
     def form_valid(self, form):
         context_data = self.get_context_data()
@@ -122,7 +124,7 @@ class MailingListSettingsUpdateView(LoginRequiredMixin, PermissionRequiredMixin,
         return super().form_valid(form)
 
 
-class MailingListSettingsDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
+class MailingListSettingsDeleteView(LoginRequiredMixin, GetObjectMixin, DeleteView):
     model = MailingListSettings
     permission_required = 'mailing_list.delete_mailinglistsettings'
     success_url = reverse_lazy('mailing:list')
@@ -131,15 +133,10 @@ class MailingListSettingsDeleteView(LoginRequiredMixin, PermissionRequiredMixin,
     }
 
     def get_object(self, queryset=None):
-        self.object = super().get_object(queryset)
-
-        if self.object.owner != self.request.user:
-            raise Http404
-
-        return self.object
+        return super().get_object(queryset)
 
 
-class MailingListSettingsDetailView(LoginRequiredMixin, PermissionRequiredMixin, DetailView):
+class MailingListSettingsDetailView(LoginRequiredMixin, GetObjectMixin, DetailView):
     model = MailingListSettings
     permission_required = 'mailing_list.view_mailinglistsettings'
     extra_context = {
@@ -147,12 +144,7 @@ class MailingListSettingsDetailView(LoginRequiredMixin, PermissionRequiredMixin,
     }
 
     def get_object(self, queryset=None):
-        self.object = super().get_object(queryset)
-
-        if self.object.owner != self.request.user:
-            raise Http404
-
-        return self.object
+        return super().get_object(queryset)
 
 
 class LogListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
