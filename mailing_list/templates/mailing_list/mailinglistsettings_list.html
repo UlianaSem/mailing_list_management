@@ -22,7 +22,9 @@
     </div>
     <hr>
     <hr>
-    <a href="{% url 'mailing:create' %}" class="btn btn-primary mb-2">Создать рассылку</a>
+    {% if perms.mailing_list.add_mailinglistsettings %}
+        <a href="{% url 'mailing:create' %}" class="btn btn-primary mb-2">Создать рассылку</a>
+    {% endif %}
     <div class="row">
         {% for object in object_list %}
 
@@ -47,8 +49,19 @@
                           {% endif %}</p>
                       <div class="d-flex justify-content-between align-items-center">
                         <div class="btn-group">
-                          <a href="{% url 'mailing:edit' object.pk %}" class="btn btn-sm btn-outline-secondary">Изменить</a>
-                          <a href="{% url 'mailing:delete' object.pk %}" class="btn btn-sm btn-outline-secondary">Удалить</a>
+                            {% if perms.mailing_list.change_mailinglistsettings %}
+                                <a href="{% url 'mailing:edit' object.pk %}" class="btn btn-sm btn-outline-secondary">Изменить</a>
+                            {% endif %}
+                            {% if perms.mailing_list.delete_mailinglistsettings %}
+                                <a href="{% url 'mailing:delete' object.pk %}" class="btn btn-sm btn-outline-secondary">Удалить</a>
+                            {% endif %}
+                            {% if perms.mailing_list.change_status %}
+                                {% if object.status == object.COMPLETED %}
+                                    <a href="{% url 'mailing:change_status' object.pk %}" class="btn btn-sm btn-outline-secondary">Разблокировать</a>
+                                {% else %}
+                                    <a href="{% url 'mailing:change_status' object.pk %}" class="btn btn-sm btn-outline-secondary">Заблокировать</a>
+                                {% endif %}
+                            {% endif %}
                         </div>
                       </div>
                     </div>
