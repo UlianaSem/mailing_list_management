@@ -1,0 +1,27 @@
+{% extends 'mailing_list/base.html' %}
+
+
+{% block content %}
+          <div class="row">
+            {% for object in object_list %}
+                <div class="col-md-6">
+                  <div class="card mb-4 box-shadow">
+                    <div class="card-header">
+                        <h3>{{ object.email }}</h3>
+                    </div>
+                    <div class="card-body">
+                        {% if object.is_active %}
+                            {% if perms.users.set_active %}
+                                <a class="btn btn-danger" href="{% url 'users:block_user' object.pk %}">Деактивировать</a>
+                            {% endif %}
+                        {% else %}
+                            {% if perms.users.set_active  %}
+                                <a class="btn btn-success" href="{% url 'users:block_user' object.pk %}">Активировать</a>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                  </div>
+                </div>
+              {% endfor %}
+          </div>
+{% endblock %}

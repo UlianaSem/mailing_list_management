@@ -1,8 +1,10 @@
+from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth.mixins import PermissionRequiredMixin, LoginRequiredMixin
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
-from django.shortcuts import redirect, render
+from django.shortcuts import redirect, render, get_object_or_404
 from django.urls import reverse
-from django.views.generic import CreateView
+from django.views.generic import CreateView, ListView
 
 from mailing_list.models import MailingListSettings, Message, Log
 from users.forms import UserRegisterForm, UserVerificationForm
@@ -58,3 +60,26 @@ def pass_verification(request, pk):
         form = UserVerificationForm()
 
     return render(request, 'users/verification_form.html', {'form': form, 'pk': pk})
+
+
+class UserListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
+    model = User
+    permission_required = 'users.set_active'
+    extra_context = {
+        'title': 'Пользователи'
+    }
+
+
+@login_required
+@permission_required('users.set_active')
+def block_user(request, pk):
+    user_item = get_object_or_404(User, pk=pk)
+
+    if user_item.is_active:
+        user_item.is_active = False
+    else:
+        user_item.is_active = True
+
+    user_item.save()
+
+    return redirect(reverse('users:list'))
