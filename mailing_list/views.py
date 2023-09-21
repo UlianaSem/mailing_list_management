@@ -170,7 +170,6 @@ class LogListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
 @login_required
 @permission_required('mailing_list.change_status')
 def change_mailing_status(request, pk):
-    fields = ('status')
     mailing_list_item = get_object_or_404(MailingListSettings, pk=pk)
 
     if (mailing_list_item.status == MailingListSettings.STARTED
