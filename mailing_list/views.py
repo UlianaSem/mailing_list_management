@@ -41,6 +41,7 @@ class GetContextDataMixin:
 
 class MailingListSettingsListView(LoginRequiredMixin, PermissionRequiredMixin, MailingListCacheMixin, ListView):
     model = MailingListSettings
+    login_url = reverse_lazy('users:login')
     permission_required = 'mailing_list.view_mailinglistsettings'
     extra_context = {
         'title': 'Список рассылок'
