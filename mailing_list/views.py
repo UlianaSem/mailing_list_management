@@ -153,7 +153,7 @@ class MailingListSettingsDetailView(LoginRequiredMixin, PermissionRequiredMixin,
 
 class LogListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
     model = Log
-    permission_required = 'mailing_list.add_log'
+    permission_required = 'mailing_list.view_log'
     extra_context = {
         'title': 'Логи рассылок'
     }
